@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function Home() {
               <img className="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEiz4LhUx453JCDUIhW4rlFZ53lGw-iYYqtfnifIRxrWh2pa6qWPTpFZgO624poah6kzthJQ5ZU58UxOOIz34SRYnP_ALM3v7cYSYGphOdQE3QYOblGKQnuLHdBvRTnqaDoDive8_oEJitUy_-cOvo2z70emwRb2FtrxSImGsZbT6MaCz-Nm-ErCLjtLMv2mt_pDzRU_0Clgcb-rnoxm9-0T0EY9E92qGttrrrU-eMmAzr3v_CACOiYg4PTw8ptV5vDKFwDFX7oUo" alt="Semillas" />
               <div className="relative z-10">
                 <h3 className="text-2xl font-serif mb-2">Explorar Lista de Semillas</h3>
-                <button className="flex items-center gap-2 hover:translate-x-2 transition-transform">Ver catálogo <span className="material-symbols-outlined">arrow_forward</span></button>
+                <NavLink to="/products" className="flex items-center gap-2 hover:translate-x-2 transition-transform">Ver catálogo <span className="material-symbols-outlined">arrow_forward</span></NavLink>
               </div>
             </div>
 
