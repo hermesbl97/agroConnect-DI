@@ -6,15 +6,15 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 grain-overlay z-50"></div>
-      
+
       <main>
         {/* Hero Section */}
         <section className="relative h-[600px] flex items-center overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <img 
-              className="w-full h-full object-cover" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtL5OfWZ6HHUO8TaAMuURVCUtZEka9hsFdOnD2m30X_Y2iwrdHczr5prhigBRfNxmaqtVvqU1XQ9vIdRTpwK8cxPUnm_mwoILn804fjg56zVDDPZDRPU0Y1U0SQ1n1koqeTUtc6OAbSfgkaSHFcbSuPGkbIrREzLJSCL8HoxITvP8mKpGo6vKz82kjJOUW8tsJ1J4UCyxjKgBK22ePt9ogWDUCdlIn8gMfkfLIm7UGwQRw7gdWX_RgkbfYohdc6Ytump_1JI0ClsM" 
-              alt="Hero" 
+            <img
+              className="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtL5OfWZ6HHUO8TaAMuURVCUtZEka9hsFdOnD2m30X_Y2iwrdHczr5prhigBRfNxmaqtVvqU1XQ9vIdRTpwK8cxPUnm_mwoILn804fjg56zVDDPZDRPU0Y1U0SQ1n1koqeTUtc6OAbSfgkaSHFcbSuPGkbIrREzLJSCL8HoxITvP8mKpGo6vKz82kjJOUW8tsJ1J4UCyxjKgBK22ePt9ogWDUCdlIn8gMfkfLIm7UGwQRw7gdWX_RgkbfYohdc6Ytump_1JI0ClsM"
+              alt="Hero"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-on-background/80 via-on-background/40 to-transparent"></div>
           </div>
@@ -44,7 +44,7 @@ export default function Home() {
                 <button className="flex items-center gap-2 hover:translate-x-2 transition-transform">Ver catálogo <span className="material-symbols-outlined">arrow_forward</span></button>
               </div>
             </div>
-            
+
             <div className="md:col-span-5 group relative overflow-hidden rounded-xl h-[350px] bg-secondary text-on-secondary p-10 flex flex-col justify-end cursor-pointer">
               <img className="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhK-ANMxorQeSaf-ZNGVEPkdHAaX5E7zUUzlk7PqzwToIhZJHibEAmeXLGCBnhDQHJNb0dMMfheqsim7fqH7_HM_vipifvwfBftMZ8yPcp70G2RL5w3gqeLRhdElZeRaVaiKpaTz9kIymKH75doTrmOiJY74t0oiyYb78gYwyo5TvHuTWiuwTnd6RfzRoMPfEAKjXkW_iXS8nS8csgZNk4TuXK7vu_-F6bq6Zd1KiNh8mz_l2KFW4vjbcNBJmGAKvtn-k2KqbOMSA" alt="Empleo" />
               <div className="relative z-10">
