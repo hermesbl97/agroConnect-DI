@@ -3,8 +3,11 @@ import { Product } from "../types/Product";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Products() {
+    const { token } = useAuth(); // <--- Extraemos el token del contexto
+
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -49,8 +52,19 @@ export default function Products() {
     });
 
     useEffect(() => {
-        fetch("http://localhost:8088/products")
-            .then((r) => r.json())
+        // Si no hay token, no intentamos la petición (el ProtectedRoute ya debería evitar esto)
+        if (!token) return;
+
+        fetch("http://localhost:8088/products", {
+            headers: {
+                "Authorization": `Bearer ${token}`, // <--- Enviamos el token a la API
+                "Content-Type": "application/json"
+            }
+        })
+            .then((r) => {
+                if (!r.ok) throw new Error("Error de autorización o servidor");
+                return r.json();
+            })
             .then((data: Product[]) => {
                 setProducts(data);
                 setLoading(false);
@@ -59,7 +73,7 @@ export default function Products() {
                 setError(err.message || "No se ha podido cargar la API");
                 setLoading(false);
             });
-    }, []);
+    }, [token]); // Se ejecuta cuando el token esté disponible
 
     if (loading) return <LoadingStatus message="Consultando catálogo de semillas..." />;
     if (error) return <ErrorStatus error={error} />;
@@ -150,9 +164,6 @@ export default function Products() {
                                                 {ecosystemIcons[product.ecosystem.toLowerCase()] || 'potted_plant'}
                                             </span>
                                         </div>
-                                        <span style={{ backgroundColor: theme.bg, color: theme.info }} className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tight">
-                                            ID: {product.id}
-                                        </span>
                                     </div>
                                     {/* Nombre y descripcion */}
                                     <h2 style={{ color: theme.primary }} className="text-2xl font-serif font-bold mb-3 leading-tight">
