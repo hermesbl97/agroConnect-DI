@@ -26,9 +26,9 @@ export default function Home() {
                 Combinamos la sabiduría tradicional del campo con las herramientas digitales más avanzadas.
               </p>
               <div className="flex gap-4">
-                <button className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold hover:brightness-110 transition-all shadow-lg">
+                <NavLink to="/products" className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold hover:brightness-110 transition-all shadow-lg">
                   Empezar ahora
-                </button>
+                </NavLink>
               </div>
             </div>
           </div>

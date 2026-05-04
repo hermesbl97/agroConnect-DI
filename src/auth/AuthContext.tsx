@@ -1,69 +1,78 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import { AuthUser, LoginRequest } from "../types/Auth";
+import { createContext, useState, useEffect, useContext, ReactNode, useReducer } from "react";
+import { AuthAction, AuthContextType, AuthState, AuthUser, LoginRequest } from "../types/Auth";
 import { meRequest, loginRequest } from "./AuthApi";
 
-interface AuthContextType {
-    user: AuthUser | null;
-    token: string | null;
-    login: (credentials: LoginRequest) => Promise<void>;
-    logout: () => void;
-    loading: boolean;
+
+// La función que gestiona el estado (reducer). Recibe el estado actual y una acción y devuelve un estado nuevo.
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+    switch (action.type) {
+        // ...state copia todo lo que hay previamente
+        case 'LOGIN_START':
+            return { ...state, loading: true, error: null }; //devolvemos una copia del estado pero con la carga
+        case 'LOGIN_SUCCESS':
+            return { ...state, loading: false, user: action.payload.user, token: action.payload.token };
+        case 'LOGIN_ERROR':
+            return { ...state, loading: false, error: action.payload };
+        case 'LOGOUT':
+            return { user: null, token: null, loading: false, error: null };
+        default:
+            return state;
+    }
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    //si el usuario refresca la página, la sesión no se cierra
-    const [token, setToken] = useState<string | null>(localStorage.getItem("auth_token")); 
-    const [user, setUser] = useState<AuthUser | null>(() => {
-        const savedUser = localStorage.getItem("auth_user");
-        return savedUser ? JSON.parse(savedUser) : null;
-    }); //se coge el usuario guardado pero como un objeto y no como un texto
-    const [loading, setLoading] = useState(false); 
 
-    const login = async (credentials: LoginRequest) => { //llama a la función de login
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    // Inicializamos el estado recuperando de LocalStorage
+    const initialState: AuthState = {
+        token: localStorage.getItem("auth_token"),
+        user: JSON.parse(localStorage.getItem("auth_user") || "null"),
+        loading: false,
+        error: null
+    };
+
+    //state contiene los valores actuales y cambiamos el estado con dispatch
+    const [state, dispatch] = useReducer(authReducer, initialState);
+
+    const login = async (credentials: LoginRequest) => {
+        dispatch({ type: 'LOGIN_START' }); //comienza el proceso de login
         try {
-            // 1. Llamamos a la API 
-            const data = await loginRequest(credentials);
-
-            const newToken = data.token;
-            const userData: AuthUser = {
-                id: 0, // O el ID que venga de la API
+            const data = await loginRequest(credentials); // Llamamos a la API 
+            const userData: AuthUser = { //rellenamos el objeto con los datos obternidos de la api y los que predefinimos 
+                id: 0,
                 username: credentials.username,
-                role: data.role as any,
+                role: data.role as AuthUser['role'],
                 email: ""
-            }; //creamos un objeto userData con los datos de las credenciales introducidas
+            };
 
-            // Guardamos en el estado de React y cambie la pantalla (aparece botón de cerrar sesión)
-            setToken(newToken);
-            setUser(userData);
-
-            // Guardamos en LocalStorage para que permanezca la sesión al cerrar el navegador
-            localStorage.setItem("auth_token", newToken);
+            localStorage.setItem("auth_token", data.token); //guardamos el token y los datos
             localStorage.setItem("auth_user", JSON.stringify(userData));
 
-        } catch (error) {
-            throw error;
+            // Notificamos al reducer que el login fue bien
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { user: userData, token: data.token } }); //Avisamos si todo va bien 
+        } catch (err: any) {
+            dispatch({ type: 'LOGIN_ERROR', payload: err.message }); //Avisamos si falla
+            throw err;
         }
     };
 
-    const logout = () => { //al cerrar sesión borra las llaves del LocalStorage y el estado de React lo deja null
+    const logout = () => { // eliminamos del LocalStorage los credenciales
         localStorage.removeItem("auth_token");
         localStorage.removeItem("auth_user");
-        setToken(null);
-        setUser(null);
+        dispatch({ type: 'LOGOUT' });
     };
 
-    return ( //pasamos los atributos que otras componentes podrán utilizar
-        <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    return ( //Gestionamos el contexto de si esta logeado o no
+        <AuthContext.Provider value={{ ...state, login, logout }}>
+            {/* Children representa a todos los componentes de la aplicación  */}
             {children}
         </AuthContext.Provider>
     );
 };
 
-
 export const useAuth = () => {
-    const context = useContext(AuthContext); 
+    const context = useContext(AuthContext);
     if (!context) throw new Error("useAuth debe usarse dentro de AuthProvider");
     return context;
 };

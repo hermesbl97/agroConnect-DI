@@ -36,6 +36,20 @@ export async function loginRequest(payload: LoginRequest): Promise<{ token: stri
     };
 }
 
+export async function registerRequest(payload: RegisterRequest): Promise<void> { //función de registro del usuario
+    const response = await fetch(`${API_BASE_URL}/users`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        throw new Error("No se pudo registrar al usuario")
+    }
+}
+
 export async function meRequest(token: string): Promise<AuthUser> { 
     //función cuando el usuario refresca la página o vuelve a entrar, 
     const response = await fetch(`${API_BASE_URL}/auth/me`, {

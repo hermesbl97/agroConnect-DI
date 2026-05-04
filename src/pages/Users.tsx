@@ -3,8 +3,10 @@ import { User } from "../types/User";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Users() {
+        const { token } = useAuth();
         const [users, setUsers] = useState<User[]>([]);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState("");
@@ -19,17 +21,26 @@ export default function Users() {
         };
 
         useEffect(() => {
-                fetch("http://localhost:8088/users")
-                        .then((r) => r.json())
-                        .then((data: User[]) => {
+                if (!token) return;
+                // Si no hay token, no intentamos la petición 
+                fetch("http://localhost:8088/users", {
+                        headers: {
+                                "Authorization": `Bearer ${token}` // Enviamos el token a la API
+                        }
+                })
+                        .then((r) => { 
+                                if (!r.ok) throw new Error("No tienes permisos para ver esto");
+                                return r.json();
+                        })
+                        .then((data) => {
                                 setUsers(data);
                                 setLoading(false);
                         })
                         .catch((err) => {
-                                setError(err.message || "No se ha podido cargar la API");
+                                setError(err.message);
                                 setLoading(false);
                         });
-        }, []);
+        }, [token]);
 
         if (loading) return <LoadingStatus message="Cargando el listado de usuarios..." />;
         if (error) return <ErrorStatus error={error} />;

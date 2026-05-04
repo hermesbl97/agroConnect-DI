@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { LoadingStatus } from "../components/LoadingStatus";
 
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
 
-    const { login } = useAuth(); //recogemos el perfil del usuario
+    const { login, error, loading } = useAuth(); //recogemos el contexto
     const navigate = useNavigate(); //permite redirigir al usuario
 
     const bodyStyle: React.CSSProperties = {
@@ -17,16 +17,16 @@ export default function Login() {
 
     const handleSubmit = async (e: React.FormEvent) => { //la función se ejecuta al pulsar entrar
         e.preventDefault(); //evita que se recargue la págian
-        setErrorMsg(''); //limpia errores anteriores
 
         try {
             // Enviamos 'username' y 'password' a la API, si todo OK manda a la home loggeado sino error
             await login({ username, password });
             navigate("/"); 
         } catch (err: any) {
-            setErrorMsg(err.message || "Credenciales incorrectas");
         }
     };
+
+    if (loading) return <LoadingStatus message="Validando credenciales..." />;
 
     return (
         <div style={bodyStyle} className="min-h-screen flex flex-col font-sans text-on-surface relative overflow-hidden">
@@ -60,9 +60,9 @@ export default function Login() {
                             <h2 className="text-2xl font-serif font-semibold text-on-surface">Acceso a la Plataforma</h2>
                         </div>
 
-                        {errorMsg && (
+                        {error && (
                             <div className="mb-6 p-3 bg-error-container text-on-error-container border border-error/20 rounded text-sm text-center font-medium">
-                                {errorMsg}
+                                {error}
                             </div>
                         )}
 
@@ -123,9 +123,9 @@ export default function Login() {
                         <div className="mt-8 pt-8 border-t border-surface-variant text-center">
                             <p className="text-sm text-on-surface-variant">
                                 ¿No tiene una cuenta?{" "}
-                                <a className="text-primary font-semibold hover:underline" href="#">
+                                <NavLink to="/register" className="text-primary font-semibold hover:underline" href="#">
                                     ¡Haz click y Regístrate!
-                                </a>
+                                </NavLink>
                             </p>
                         </div>
                     </div>

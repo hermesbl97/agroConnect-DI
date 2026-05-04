@@ -9,6 +9,7 @@ import Users from './pages/Users'
 import Login from './pages/Login'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './auth/AuthContext'
+import RegisterUser from './pages/RegisterUser'
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             {/* Rutas Públicas para usuarios registrados y no registrados*/}
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
+            <Route path="/register" element={<RegisterUser />} />
 
             {/* Rutas Protegidas (Cualquier usuario logueado) */}
             <Route element={<ProtectedRoute />}>

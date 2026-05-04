@@ -57,7 +57,7 @@ export default function Products() {
 
         fetch("http://localhost:8088/products", {
             headers: {
-                "Authorization": `Bearer ${token}`, // <--- Enviamos el token a la API
+                "Authorization": `Bearer ${token}`, // Enviamos el token a la API
                 "Content-Type": "application/json"
             }
         })
