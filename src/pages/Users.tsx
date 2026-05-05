@@ -46,7 +46,7 @@ export default function Users() {
                 setLoading(true);
                 try {
                         await updateUserRequest(token, editingUser);
-// Actualización local. Si el usuario que recorro es el que he editado, pon los nuevos datos del form, sino déjalo como está
+                        // Actualización local. Si el usuario que recorro es el que he editado, pon los nuevos datos del form, sino déjalo como está
                         setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
                         setEditingUser(null);
                 } catch (err: any) {
@@ -65,6 +65,20 @@ export default function Users() {
                         [name]: name === "telephoneNumber" ? Number(value) : value
                         //  Si el input que está cambiando es el del teléfono conviértelo a Número. Si no, déjalo como texto.
                 });
+        };
+
+        const handleDelete = async (userId: number) => {
+                if (!window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) return;
+                setLoading(true);
+                try {
+                        await deleteUserRequest(token, userId);
+                        // Filtramos la lista localmente para que desaparezca de la tabla
+                        setUsers(users.filter(u => u.id !== userId));
+                } catch (err: any) {
+                        alert(err.message);
+                } finally {
+                        setLoading(false);
+                }
         };
 
         if (loading) return <LoadingStatus message="Cargando el listado de usuarios..." />;
@@ -153,8 +167,8 @@ export default function Users() {
                                                                                         <button onClick={() => setEditingUser(user)} className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg mr-1">
                                                                                                 <span className="material-symbols-outlined">edit_square</span>
                                                                                         </button>
-                                                                                        {/* Botón de borrar  */}
-                                                                                        <button className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                                                                                        {/* Botón de borrar por id del elemento de la tabla */}
+                                                                                        <button onClick={() => handleDelete(user.id)} className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
                                                                                                 <span className="material-symbols-outlined">delete</span>
                                                                                         </button>
                                                                                 </td>
