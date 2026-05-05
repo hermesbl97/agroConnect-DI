@@ -24,6 +24,7 @@ export default function Register() {
     setFormData((prev) => ({
       ...prev,
       [name]: name === "telephoneNumber" ? Number(value) : value,
+      //  Si el input que está cambiando es el del teléfono conviértelo a Número. Si no, déjalo como texto.
     }));
   };
 

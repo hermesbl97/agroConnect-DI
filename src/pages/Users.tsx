@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { User } from "../types/User";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
 import { useAuth } from "../auth/AuthContext";
-import { getUsersRequest } from "../services/UsersApi";
+import { deleteUserRequest, getUsersRequest, updateUserRequest } from "../services/UsersApi";
 
 export default function Users() {
         const { token } = useAuth();
         const [users, setUsers] = useState<User[]>([]);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState("");
+        const [editingUser, setEditingUser] = useState<User | null>(null);
 
         // Colores de los badges según el rol 
         const getRoleBadgeStyle = (role: string) => {
@@ -21,17 +22,15 @@ export default function Users() {
                 return "bg-blue-100 text-blue-800 border border-blue-200";
         };
 
+        //Al entrar en la página tiene lugar la carga de la tabla si tienes autorización 
         useEffect(() => {
-
                 if (!token) return;
-
                 setLoading(true);
 
-                // Si no hay token, no intentamos la petición 
                 getUsersRequest(token)
                         .then((data) => {
                                 setUsers(data);
-                                setError(""); // Limpiamos errores previos si tiene éxito
+                                setError("");
                         })
                         .catch((err) => {
                                 setError(err.message);
@@ -41,56 +40,130 @@ export default function Users() {
                         });
         }, [token]);
 
+        const handleSave = async (e: React.FormEvent) => {
+                e.preventDefault(); //evita que la pagina se recargue
+                if (!editingUser) return;
+                setLoading(true);
+                try {
+                        await updateUserRequest(token, editingUser);
+// Actualización local. Si el usuario que recorro es el que he editado, pon los nuevos datos del form, sino déjalo como está
+                        setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+                        setEditingUser(null);
+                } catch (err: any) {
+                        alert(err.message);
+                } finally {
+                        setLoading(false);
+                }
+        };
+
+
+        const handleEditChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { //capturamos los datos
+                if (!editingUser) return; //si no se ha activado editar un usuario, abortar función
+                const { name, value } = e.target;
+                setEditingUser({
+                        ...editingUser, //hacemos copia del usuario actual
+                        [name]: name === "telephoneNumber" ? Number(value) : value
+                        //  Si el input que está cambiando es el del teléfono conviértelo a Número. Si no, déjalo como texto.
+                });
+        };
+
         if (loading) return <LoadingStatus message="Cargando el listado de usuarios..." />;
         if (error) return <ErrorStatus error={error} />;
 
         return (
-                <div style={{ backgroundColor: theme.bg, minHeight: "100vh" }} className="font-sans antialiased">
-                        <main className="max-w-7xl mx-auto px-6 py-12">
+                <div style={{ backgroundColor: theme.bg, minHeight: "100vh" }} className="p-6">
+                        <main className="max-w-7xl mx-auto">
+                                {/* Formulario de editar */}
+                                {/* En función de si editingUser es null o no se muestra la tabla o el formnulario */}
+                                {editingUser ? (
+                                        <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-zinc-100">
+                                                <h2 className="text-2xl font-bold mb-6 text-emerald-900 flex items-center gap-2">
+                                                        <span className="material-symbols-outlined">manage_accounts</span>
+                                                        Modificar Perfil: {editingUser.username}
+                                                </h2>
 
-                                {/* --- Header --- */}
-                                <div className="mb-12 border-l-4 pl-6" style={{ borderColor: theme.primary }}>
-                                        <h1 className="text-4xl font-serif font-bold mb-2" style={{ color: theme.primary }}>
-                                                Gestión de Usuarios
-                                        </h1>
-                                        <p className="text-lg opacity-80" style={{ color: theme.subtext }}>
+                                                <form onSubmit={handleSave} className="space-y-5">
+                                                        <div className="space-y-1">
+                                                                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Rol de Usuario</label>
+                                                                <select
+                                                                        name="role"
+                                                                        value={editingUser.role}
+                                                                        onChange={handleEditChange}
+                                                                        className="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-medium"
+                                                                >
+                                                                        <option value="user">USER (Estándar)</option>
+                                                                        <option value="agricultor">AGRICULTOR (Gestión de cultivos)</option>
+                                                                        <option value="admin">ADMIN (Control total)</option>
+                                                                </select>
+                                                        </div>
 
-                                        </p>
-                                </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Nombre</label>
+                                                                        <input name="name" value={editingUser.name} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Apellidos</label>
+                                                                        <input name="surname" value={editingUser.surname} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                                                                </div>
+                                                        </div>
 
-                                {/* ---  TABLA DE DATOS --- */}
-                                <div className="bg-white border overflow-hidden shadow-sm rounded-lg" style={{ borderColor: theme.borders }}>
-                                        <div className="overflow-x-auto">
-                                                <table className="w-full text-left border-collapse">
-                                                        <thead>
-                                                                <tr className="bg-slate-50 border-b" style={{ borderColor: theme.borders }}>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Username</th>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Nombre</th>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Apellidos</th>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Rol</th>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Email</th>
-                                                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">Teléfono</th>
+                                                        <div className="space-y-1">
+                                                                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Email de contacto</label>
+                                                                <input name="email" value={editingUser.email} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                                                        </div>
+
+                                                        <div className="flex gap-3 pt-4">
+                                                                <button type="button" onClick={() => setEditingUser(null)} className="flex-1 py-3 border border-zinc-200 rounded-lg font-bold text-zinc-600 hover:bg-zinc-50">
+                                                                        CANCELAR
+                                                                </button>
+                                                                <button type="submit" className="flex-[2] py-3 bg-emerald-800 text-white rounded-lg font-bold hover:bg-emerald-900 shadow-lg shadow-emerald-900/20">
+                                                                        GUARDAR CAMBIOS
+                                                                </button>
+                                                        </div>
+                                                </form>
+                                        </div>
+                                ) : (
+                                        /* TABLA DE USUARIOS */
+                                        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+                                                <table className="w-full text-left">
+                                                        <thead className="bg-zinc-50 border-b border-zinc-200">
+                                                                <tr>
+                                                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase">Usuario</th>
+                                                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase">Rol</th>
+                                                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase">Email</th>
+                                                                        <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase text-right">Acciones</th>
                                                                 </tr>
                                                         </thead>
-                                                        <tbody className="divide-y" style={{ borderColor: theme.borders }}>
-                                                                {users.map((user) => ( //Recorremos el array rellenando la tabla
-                                                                        <tr className="hover:bg-slate-50 transition-colors group">
-                                                                                <td className="px-6 py-5 font-semibold" style={{ color: theme.primary }}>{user.username}</td>
-                                                                                <td className="px-6 py-5 text-slate-700">{user.name}</td>
-                                                                                <td className="px-6 py-5 text-slate-700">{user.surname}</td>
-                                                                                <td className="px-6 py-5">
-                                                                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter ${getRoleBadgeStyle(user.role)}`}>
+                                                        <tbody className="divide-y divide-zinc-100">
+                                                                {users.map((user) => ( //se dibuja una fila de la tabla con cada usuario
+                                                                        <tr key={user.id} className="hover:bg-zinc-50/50 transition-colors">
+                                                                                <td className="px-6 py-4">
+                                                                                        <div className="font-bold text-emerald-900">{user.username}</div>
+                                                                                        <div className="text-xs text-zinc-400">{user.name} {user.surname}</div>
+                                                                                </td>
+                                                                                <td className="px-6 py-4">
+                                                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${getRoleBadgeStyle(user.role)}`}>
                                                                                                 {user.role}
                                                                                         </span>
                                                                                 </td>
-                                                                                <td className="px-6 py-5 text-slate-500">{user.email}</td>
-                                                                                <td className="px-6 py-5 text-slate-500 font-medium">{user.telephoneNumber}</td>
+                                                                                <td className="px-6 py-4 text-sm text-zinc-500">{user.email}</td>
+                                                                                <td className="px-6 py-4 text-right">
+                                                                                        {/* Botón de editar el usuario seleccionado  */}
+                                                                                        <button onClick={() => setEditingUser(user)} className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg mr-1">
+                                                                                                <span className="material-symbols-outlined">edit_square</span>
+                                                                                        </button>
+                                                                                        {/* Botón de borrar  */}
+                                                                                        <button className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                                                                                                <span className="material-symbols-outlined">delete</span>
+                                                                                        </button>
+                                                                                </td>
                                                                         </tr>
                                                                 ))}
                                                         </tbody>
                                                 </table>
                                         </div>
-                                </div>
+                                )}
                         </main>
                 </div>
         );
