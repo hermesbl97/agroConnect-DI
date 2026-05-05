@@ -7,7 +7,7 @@ import { getProductsRequest } from "../services/ProductsApi";
 import { useAuth } from "../auth/AuthContext";
 
 export default function Products() {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -62,8 +62,17 @@ export default function Products() {
             .finally(() => setLoading(false));
     }, [token]); // Se ejecuta cuando el token esté disponible
 
+    // Calcula estos valores antes del return del componente
+    const totalProducts = products.length;
+    const avgGrowth = products.length > 0
+        ? (products.reduce((acc, p) => acc + Number(p.growthEstimatedTime), 0) / products.length).toFixed(0)
+        : 0;
+    const ecosystemCount = ecosystemOptions.length;
+
     if (loading) return <LoadingStatus message="Consultando catálogo de semillas..." />;
-    if (error) return <ErrorStatus error={error} />;
+    if (error) return <ErrorStatus error={theme.error} />;
+
+
 
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: "100vh" }} className="font-sans antialiased">
@@ -74,11 +83,39 @@ export default function Products() {
                         Catálogo de Semillas
                     </h1>
                 </header>
+                {/* LÓGICA DE DASHBOARD POR ROL */}
+                {(user?.role === 'admin' || user?.role === 'agricultor') && (
+                    /* VISTA ADMIN/AGRICULTOR: Se muestran los componentes de resumen */
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                            className="p-6 rounded-xl border shadow-sm">
+                            <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                Total Variedades</p>
+                            <p style={{ color: theme.primary }} className="text-3xl font-bold">{totalProducts}</p>
+                        </div>
+                        <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                            className="p-6 rounded-xl border shadow-sm">
+                            <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                Ecosistemas</p>
+                            <p style={{ color: theme.primary }} className="text-3xl font-bold">
+                                {ecosystemCount}</p>
+                        </div>
+                        <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                            className="p-6 rounded-xl border shadow-sm">
+                            <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                Media Crecimiento</p>
+                            <p style={{ color: theme.primary }} className="text-3xl font-bold">
+                                {avgGrowth} <span className="text-sm font-normal">días</span></p>
+                        </div>
+                    </div>
+                )}
 
                 <div
                     style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
                     className="mb-8 p-4 rounded-xl border shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between"
                 >
+
+
                     <div className="flex flex-1 w-full gap-4">
                         {/* Buscador */}
                         <div className="relative flex-1">
@@ -133,6 +170,7 @@ export default function Products() {
                     </span>
                 </div>
 
+
                 {/* Tarjeta de productos */}
                 <section>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -151,9 +189,6 @@ export default function Products() {
                                                 {ecosystemIcons[product.ecosystem.toLowerCase()] || 'potted_plant'}
                                             </span>
                                         </div>
-                                        <span style={{ backgroundColor: theme.bg, color: theme.info }} className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tight">
-                                            ID: {product.id}
-                                        </span>
                                     </div>
                                     {/* Nombre y descripcion */}
                                     <h2 style={{ color: theme.primary }} className="text-2xl font-serif font-bold mb-3 leading-tight">
