@@ -4,6 +4,7 @@ import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
 import { useAuth } from "../auth/AuthContext";
+import { getUsersRequest } from "../services/UsersApi";
 
 export default function Users() {
         const { token } = useAuth();
@@ -21,23 +22,21 @@ export default function Users() {
         };
 
         useEffect(() => {
+
                 if (!token) return;
+
+                setLoading(true);
+
                 // Si no hay token, no intentamos la petición 
-                fetch("http://localhost:8088/users", {
-                        headers: {
-                                "Authorization": `Bearer ${token}` // Enviamos el token a la API
-                        }
-                })
-                        .then((r) => { 
-                                if (!r.ok) throw new Error("No tienes permisos para ver esto");
-                                return r.json();
-                        })
+                getUsersRequest(token)
                         .then((data) => {
                                 setUsers(data);
-                                setLoading(false);
+                                setError(""); // Limpiamos errores previos si tiene éxito
                         })
                         .catch((err) => {
                                 setError(err.message);
+                        })
+                        .finally(() => {
                                 setLoading(false);
                         });
         }, [token]);
