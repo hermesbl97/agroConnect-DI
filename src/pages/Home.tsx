@@ -49,7 +49,7 @@ export default function Home() {
               <img className="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhK-ANMxorQeSaf-ZNGVEPkdHAaX5E7zUUzlk7PqzwToIhZJHibEAmeXLGCBnhDQHJNb0dMMfheqsim7fqH7_HM_vipifvwfBftMZ8yPcp70G2RL5w3gqeLRhdElZeRaVaiKpaTz9kIymKH75doTrmOiJY74t0oiyYb78gYwyo5TvHuTWiuwTnd6RfzRoMPfEAKjXkW_iXS8nS8csgZNk4TuXK7vu_-F6bq6Zd1KiNh8mz_l2KFW4vjbcNBJmGAKvtn-k2KqbOMSA" alt="Empleo" />
               <div className="relative z-10">
                 <h3 className="text-2xl font-serif mb-2">Plataforma de Empleo</h3>
-                <button className="flex items-center gap-2 hover:translate-x-2 transition-transform">Buscar oportunidades <span className="material-symbols-outlined">work</span></button>
+                <NavLink to="/joboffers" className="flex items-center gap-2 hover:translate-x-2 transition-transform">Buscar oportunidades <span className="material-symbols-outlined">work</span></NavLink>
               </div>
             </div>
           </div>
