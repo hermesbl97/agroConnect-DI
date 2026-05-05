@@ -3,8 +3,11 @@ import { User } from "../types/User";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
+import { useAuth } from "../auth/AuthContext";
+import { getUsersRequest } from "../services/UsersApi";
 
 export default function Users() {
+        const { token } = useAuth();
         const [users, setUsers] = useState<User[]>([]);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState("");
@@ -19,17 +22,24 @@ export default function Users() {
         };
 
         useEffect(() => {
-                fetch("http://localhost:8088/users")
-                        .then((r) => r.json())
-                        .then((data: User[]) => {
+
+                if (!token) return;
+
+                setLoading(true);
+
+                // Si no hay token, no intentamos la petición 
+                getUsersRequest(token)
+                        .then((data) => {
                                 setUsers(data);
-                                setLoading(false);
+                                setError(""); // Limpiamos errores previos si tiene éxito
                         })
                         .catch((err) => {
-                                setError(err.message || "No se ha podido cargar la API");
+                                setError(err.message);
+                        })
+                        .finally(() => {
                                 setLoading(false);
                         });
-        }, []);
+        }, [token]);
 
         if (loading) return <LoadingStatus message="Cargando el listado de usuarios..." />;
         if (error) return <ErrorStatus error={error} />;

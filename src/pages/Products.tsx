@@ -3,8 +3,12 @@ import { Product } from "../types/Product";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { ErrorStatus } from "../components/ErrorStatus";
 import { theme } from "../styles/colors";
+import { getProductsRequest } from "../services/ProductsApi";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Products() {
+    const { token } = useAuth();
+
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -49,17 +53,14 @@ export default function Products() {
     });
 
     useEffect(() => {
-        fetch("http://localhost:8088/products")
-            .then((r) => r.json())
-            .then((data: Product[]) => {
-                setProducts(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err.message || "No se ha podido cargar la API");
-                setLoading(false);
-            });
-    }, []);
+        // Si no hay token, no intentamos la petición (el ProtectedRoute ya debería evitar esto)
+        if (!token) return;
+
+        getProductsRequest(token)
+            .then(data => setProducts(data))
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [token]); // Se ejecuta cuando el token esté disponible
 
     if (loading) return <LoadingStatus message="Consultando catálogo de semillas..." />;
     if (error) return <ErrorStatus error={error} />;
