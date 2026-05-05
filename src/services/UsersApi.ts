@@ -32,3 +32,16 @@ export async function updateUserRequest(token: string | null, user: User): Promi
 
     if (!response.ok) throw new Error("No se pudieron guardar los cambios");
 }
+
+export async function deleteUserRequest(token: string | null, userId: number): Promise<void> {
+    if (!token) throw new Error("No hay sesión activa"); // Seguridad extra
+
+    const response = await fetch(`http://localhost:8088/users/${userId}`, {
+        method: "DELETE",
+        headers: { 
+            "Authorization": `Bearer ${token}` 
+        }
+    });
+    
+    if (!response.ok) throw new Error("No se pudo eliminar el usuario");
+}
