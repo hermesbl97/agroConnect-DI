@@ -22,17 +22,10 @@ export default function Navbar() {
               <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/products">
                 Productos
               </NavLink>
-              <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/#">
+              <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/joboffers">
                 Plataforma de Empleo
               </NavLink>
             </>
-          )}
-
-          {/* Opción para Agricultores y Admins */}
-          {(user?.role === 'agricultor' || user?.role === 'admin') && (
-            <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/#">
-              Plantaciones
-            </NavLink>
           )}
 
           {/* Opción exclusiva para Admin */}

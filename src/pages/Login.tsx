@@ -123,7 +123,7 @@ export default function Login() {
                         <div className="mt-8 pt-8 border-t border-surface-variant text-center">
                             <p className="text-sm text-on-surface-variant">
                                 ¿No tiene una cuenta?{" "}
-                                <NavLink to="/register" className="text-primary font-semibold hover:underline" href="#">
+                                <NavLink to="/register" className="text-primary font-semibold hover:underline">
                                     ¡Haz click y Regístrate!
                                 </NavLink>
                             </p>
