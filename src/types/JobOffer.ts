@@ -23,3 +23,13 @@ export interface JobOfferModifyInDto {
     state: boolean;
     creatorId: number // Extraemos solo el ID
 };
+
+export interface JobOfferInDto {
+    title: string;
+    description: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    salary: number;
+    creatorId: number;
+}

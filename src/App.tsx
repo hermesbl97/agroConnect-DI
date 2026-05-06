@@ -11,6 +11,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './auth/AuthContext'
 import RegisterUser from './pages/RegisterUser'
 import JobOffers from './pages/JobOffers'
+import RegisterJobOffer from './pages/RegisterJobOffer'
 
 
 function App() {
@@ -38,8 +39,9 @@ function App() {
               <Route path="/users" element={<Users />} />
             </Route>
 
-            {/* Rutas para agricultores y agricultor */}
+            {/* Rutas para agricultores y admin */}
             <Route element={<ProtectedRoute allowedRoles={['admin', 'agricultor']} />}>
+                          <Route path="/registerJobOffer" element={<RegisterJobOffer />} />
             </Route>
           </Routes>
           <Footer />

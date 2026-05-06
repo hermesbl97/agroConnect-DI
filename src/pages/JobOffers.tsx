@@ -5,6 +5,7 @@ import { deleteJobOfferRequest, getJobOffersRequest, updateJobOfferRequest } fro
 import { ErrorStatus } from "../components/ErrorStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { theme } from "../styles/colors";
+import { NavLink } from "react-router-dom";
 
 export default function JobOffers() {
     const { token, user } = useAuth();
@@ -57,6 +58,22 @@ export default function JobOffers() {
             [name]: value
         });
     };
+
+    const handleDelete = async (jobOfferId: number) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar esta oferta de empleo?")) return;
+        setLoading(true);
+
+        try {
+            await deleteJobOfferRequest(token, jobOfferId);
+            // Filtramos la lista localmente para que desaparezca de la tabla
+            setJobOffers(jobOffers.filter(u => u.id !== jobOfferId));
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     if (loading) return <LoadingStatus message="Cargando el listado de ofertas de trabajo..." />;
     if (error) return <ErrorStatus error={error} />;
@@ -144,9 +161,9 @@ export default function JobOffers() {
 
                             {/* Solo Agricultores o Admin pueden publicar */}
                             {(user?.role === 'admin' || user?.role === 'agricultor') && (
-                                <button style={{ backgroundColor: theme.primary }} className="text-white px-6 py-3 rounded font-bold shadow-lg">
+                                <NavLink to="/registerJobOffer" style={{ backgroundColor: theme.primary }} className="text-white px-6 py-3 rounded font-bold shadow-lg">
                                     Publicar Oferta
-                                </button>
+                                </NavLink>
                             )}
                         </div>
 
@@ -203,6 +220,7 @@ export default function JobOffers() {
                                             </button>
                                         )}    {(user?.role === 'admin' || user?.id === jobOffer.creator?.id) && (
                                             <button
+                                                onClick={() => handleDelete(jobOffer.id)}
                                                 style={{ color: theme.error }}
                                                 className="p-2 hover:bg-red-50 rounded">
                                                 Eliminar

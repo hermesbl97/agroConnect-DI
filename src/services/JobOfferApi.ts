@@ -1,4 +1,4 @@
-import { JobOffer, JobOfferModifyInDto } from "../types/JobOffer";
+import { JobOffer, JobOfferInDto, JobOfferModifyInDto } from "../types/JobOffer";
 
 export async function getJobOffersRequest(token: string) {
     if (!token) {
@@ -28,7 +28,7 @@ export async function updateJobOfferRequest(token: string | null, jobOffer: JobO
         state: jobOffer.state,
         creatorId: jobOffer.creator?.id || 0 // Id del creador o 0 porque podría ser indefinido
     };
-    
+
     const response = await fetch(`http://localhost:8088/joboffers/${jobOffer.id}`, {
         method: "PUT",
         headers: {
@@ -39,4 +39,16 @@ export async function updateJobOfferRequest(token: string | null, jobOffer: JobO
     });
 
     if (!response.ok) throw new Error("No se pudieron guardar los cambios");
+}
+
+export async function deleteJobOfferRequest(token: string | null, jobOfferId: number): Promise<void> {
+    if (!token) throw new Error("No hay sesión activa"); // Seguridad extra
+
+    const response = await fetch(`http://localhost:8088/joboffers/${jobOfferId}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+    if (!response.ok) throw new Error("No se pudo eliminar la oferta de empleo");
 }
