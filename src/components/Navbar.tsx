@@ -28,13 +28,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Opción para Agricultores y Admins */}
-          {(user?.role === 'agricultor' || user?.role === 'admin') && (
-            <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/#">
-              Plantaciones
-            </NavLink>
-          )}
-
           {/* Opción exclusiva para Admin */}
           {user?.role === 'admin' && (
             <NavLink className="text-zinc-600 hover:text-emerald-800 font-serif transition-colors" to="/users">
