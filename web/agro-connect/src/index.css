@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+.grain-overlay {
+  background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCKOZiRIYJwyVTFB7bShueTzwZQUEE-nz10k9CBgExZMCLyL34j_IykJtZAp0BttbLcJ9VUnTiAyGbqC2rWB6nhbIVMLF_kX6d9imOOuCkRVT6BX_NKgKbk_Ix59HZD3Q_LjLxOeVP1KFZoNubTdlU8XI_PMKNpBmTWs3-q_CbJVmxVuPL3wVBAtuQulC8gr9zbExhteDo1DQ5vbA8pBzTrVfa6rhD2ZRKWjkravDWCnp2IcmjiwY0r73GH9dlDeo0cYmRvRxCqHIU);
+  opacity: 0.03;
+  pointer-events: none;
+}
