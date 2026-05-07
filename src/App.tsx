@@ -41,7 +41,7 @@ function App() {
 
             {/* Rutas para agricultores y admin */}
             <Route element={<ProtectedRoute allowedRoles={['admin', 'agricultor']} />}>
-                          <Route path="/registerJobOffer" element={<RegisterJobOffer />} />
+            <Route path="/registerJobOffer" element={<RegisterJobOffer />} />
             </Route>
           </Routes>
           <Footer />

@@ -15,8 +15,8 @@ function extractToken(data: LoginRespone): string { //si hay token coge el token
     return token
 }
 
-export async function loginRequest(payload: LoginRequest): Promise<{ token: string; role: string }> {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+export async function loginRequest(payload: LoginRequest): Promise<{ token: string; role: string; id:number }> {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -25,14 +25,15 @@ export async function loginRequest(payload: LoginRequest): Promise<{ token: stri
     });  //Se envia el payload (username y password) en formato json
 
     //si la API devuelve un error 
-    if(!response.ok) throw new Error("Credenciales incorrectas");
+    if (!response.ok) throw new Error("Credenciales incorrectas");
 
     //convierte la respuesta en un objeto
     const data = await response.json();
     // Extraemos el token con la función extractToken y devolvemos el rol
     return {
         token: extractToken(data),
-        role: data.role
+        role: data.role,
+        id: Number(data.userId)
     };
 }
 
@@ -50,7 +51,7 @@ export async function registerRequest(payload: RegisterRequest): Promise<void> {
     }
 }
 
-export async function meRequest(token: string): Promise<AuthUser> { 
+export async function meRequest(token: string): Promise<AuthUser> {
     //función cuando el usuario refresca la página o vuelve a entrar, 
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
@@ -63,5 +64,5 @@ export async function meRequest(token: string): Promise<AuthUser> {
     }
 
     //Se obliga a que la respuesta del usuario sea con el modelo AuthUser para que la app conozca los datos que tiene el usuario logueado
-    return (await response.json()) as AuthUser 
+    return (await response.json()) as AuthUser
 };

@@ -105,7 +105,7 @@ export default function JobOffers() {
                         <form onSubmit={handleSave} className="space-y-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Título de la vacante</label>
-                                <input name="title" value={editingJobOffer.title} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" required />
+                               <input name="title" value={editingJobOffer.title} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" required />
                             </div>
 
                             <div className="space-y-1">
@@ -235,4 +235,4 @@ export default function JobOffers() {
             </main>
         </div>
     );
-}
+} 

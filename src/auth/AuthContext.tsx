@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const data = await loginRequest(credentials); // Llamamos a la API 
             const userData: AuthUser = { //rellenamos el objeto con los datos obternidos de la api y los que predefinimos 
-                id: 0,
+                id: data.id,
                 username: credentials.username,
                 role: data.role as AuthUser['role'],
                 email: ""
