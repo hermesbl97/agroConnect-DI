@@ -14,6 +14,43 @@ export default function JobOffers() {
     const [error, setError] = useState("");
     const [editingJobOffer, setEditingJobOffer] = useState<JobOffer | null>(null);
 
+    const [query, setQuery] = useState("");
+    const [locationFilter, setLocationFilter] = useState("all");
+    const [sortOrder, setSortOrderJobOffer] = useState<"asc" | "des">("asc");
+    const [minSalary, setMinSalary] = useState<number>(0);
+
+    const locationOptions = Array.from(
+        new Set(jobOffers.map((jobOffer) => jobOffer.location)),
+    ).sort();
+
+    const normalizedQuery = query.trim().toLowerCase();
+    const filteredJobOffers = jobOffers.filter((jobOffer) => {
+
+        // Filtrado por Localización
+        if (locationFilter !== "all" && jobOffer.location !== locationFilter) {
+            return false;
+        }
+
+        if (jobOffer.salary < minSalary) {
+            return false;
+        }
+
+        // Búsqueda por titulo, localización o descripción)
+        if (!normalizedQuery) return true;
+        const searchableText = [jobOffer.title, jobOffer.location, jobOffer.description]
+            .join(" ")
+            .toLowerCase();
+        return searchableText.includes(normalizedQuery);
+    });
+
+
+    //Ordenación ascendente o descendente
+    const sortedJobOffers = [...filteredJobOffers].sort((a, b) => {
+        const comparison = a.title.localeCompare(b.title);
+        return sortOrder === "asc" ? comparison : -comparison;
+    });
+
+
     //Al entrar en la página tiene lugar la carga de la tabla si tienes autorización 
     useEffect(() => {
         if (!token) return;
@@ -105,7 +142,7 @@ export default function JobOffers() {
                         <form onSubmit={handleSave} className="space-y-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Título de la vacante</label>
-                               <input name="title" value={editingJobOffer.title} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" required />
+                                <input name="title" value={editingJobOffer.title} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" required />
                             </div>
 
                             <div className="space-y-1">
@@ -166,9 +203,80 @@ export default function JobOffers() {
                                 </NavLink>
                             )}
                         </div>
+                        <div
+                            style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                            className="mb-8 p-4 rounded-xl border shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between"
+                        >
+
+
+                            <div className="flex flex-1 w-full gap-4">
+                                {/* Buscador */}
+                                <div className="relative flex-1">
+                                    <span style={{ color: theme.subtext }} className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2">search</span>
+                                    <input
+                                        type="text"
+                                        value={query}
+                                        onChange={(jobOffer) => setQuery(jobOffer.target.value)}
+                                        placeholder="Buscar por titulo, localización o texto relacionado"
+                                        style={{ borderColor: theme.borders, height: '48px' }}
+                                        className="w-full pl-11 pr-4 rounded-lg border bg-white focus:ring-2 focus:ring-primary outline-none transition-all text-base"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-4">
+                                {/* Filtro de salario minimo */}
+                                <div className="relative flex items-center">
+                                    <span style={{ color: theme.subtext }} className="material-symbols-outlined absolute left-3 pointer-events-none">payments</span>
+                                    <input
+                                        type="number"
+                                        value={minSalary || ""}
+                                        onChange={(e) => setMinSalary(Number(e.target.value))}
+                                        placeholder="Salario mín. €/h"
+                                        style={{ borderColor: theme.borders, height: '48px' }}
+                                        className="pl-10 pr-4 w-full lg:w-40 rounded-lg border bg-white focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                                    />
+                                </div>
+                                {/* Filtro de loalización */}
+                                <select
+                                    value={locationFilter}
+                                    onChange={(jobOffer) => setLocationFilter(jobOffer.target.value)}
+                                    style={{ borderColor: theme.borders, color: theme.text }}
+                                    className="px-4 py-2 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    <option value="all">Todas los ecosistemas</option>
+                                    {locationOptions.map((location) => (
+                                        <option key={location} value={location}>
+                                            {location}
+                                        </option>
+                                    ))}
+
+                                </select>
+
+                                {/* Filtro de orden */}
+                                <select
+                                    value={sortOrder}
+                                    onChange={(jobOffer) => setSortOrderJobOffer(jobOffer.target.value as "asc" | "des")}
+                                    style={{ borderColor: theme.borders, color: theme.text, height: '48px' }}
+                                    className="px-4 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-primary min-w-[180px] cursor-pointer"
+                                >
+                                    <option value="asc">Orden: A a la Z</option>
+                                    <option value="des">Orden: Z a la A</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Contador de resultados */}
+                        <div className="mb-6 text-center">
+                            <span style={{ color: theme.subtext }} className="text-sm font-medium uppercase tracking-wider">
+                                {sortedJobOffers.length === 0
+                                    ? "No se han encontrado resultados para tu búsqueda"
+                                    : `Se han encontrado ${sortedJobOffers.length} productos`}
+                            </span>
+                        </div>
 
                         <div className="grid gap-6">
-                            {jobOffers.map((jobOffer) => (
+                            {sortedJobOffers.map((jobOffer) => (
                                 <div key={jobOffer.id} style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="border rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
 
                                     {/* Icono de Oferta */}
