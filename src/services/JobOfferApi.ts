@@ -14,6 +14,24 @@ export async function getJobOffersRequest(token: string) {
     return await response.json();
 }
 
+export async function createJobOfferRequest(token: string | null, payload: JobOfferInDto): Promise<void> {
+    if (!token) throw new Error("No hay sesión activa");
+
+    const response = await fetch("http://localhost:8088/joboffers", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        throw new Error("No se pudo publicar la oferta de empleo");
+    }
+}
+
+
 export async function updateJobOfferRequest(token: string | null, jobOffer: JobOffer): Promise<void> {
     if (!token) throw new Error("No hay sesión activa");
 
