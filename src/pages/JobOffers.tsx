@@ -111,6 +111,12 @@ export default function JobOffers() {
         }
     };
 
+        // Calcula estos valores antes del return del componente
+    const totalJobOffers = jobOffers.length;
+    const avgSalary = jobOffers.length > 0
+        ? (jobOffers.reduce((acc, p) => acc + Number(p.salary), 0) / jobOffers.length).toFixed(0)
+        : 0;
+    const locationCount = locationOptions.length;
 
     if (loading) return <LoadingStatus message="Cargando el listado de ofertas de trabajo..." />;
     if (error) return <ErrorStatus error={error} />;
@@ -203,6 +209,34 @@ export default function JobOffers() {
                                 </NavLink>
                             )}
                         </div>
+
+                        {/* LÓGICA DE DASHBOARD POR ROL */}
+                        {(user?.role === 'admin' || user?.role === 'agricultor') && (
+                            /* VISTA ADMIN/AGRICULTOR: Se muestran los componentes de resumen */
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                                    className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                        Número de Ofertas de empleo</p>
+                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">{totalJobOffers}</p>
+                                </div>
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                                    className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                        Número de localizaciones</p>
+                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">
+                                        {locationCount}</p>
+                                </div>
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
+                                    className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
+                                        Salario medio</p>
+                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">
+                                        {avgSalary} <span className="text-sm font-normal">€/hora</span></p>
+                                </div>
+                            </div>
+                        )}
+
                         <div
                             style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
                             className="mb-8 p-4 rounded-xl border shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between"
