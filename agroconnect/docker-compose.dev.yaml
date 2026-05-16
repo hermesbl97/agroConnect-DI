@@ -1,0 +1,12 @@
+name: agroConnect2
+services:
+  db:
+    image: mariadb:11.3.2
+    container_name: agroConnect-db2
+    environment:
+      MARIADB_DATABASE: agroConnect_database2
+      MARIADB_USER: agroConnect_user2
+      MARIADB_PASSWORD: agroConnect_password2
+      MARIADB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3309:3306"

@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mariadb:11.3.2
+    container_name: agroConnect-db2
+    environment:
+      MARIADB_DATABASE: agroConnect_database2
+      MARIADB_USER: agroConnect_user2
+      MARIADB_PASSWORD: agroConnect_password2
+      MARIADB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3309:3306"
+
+  backend:
+    build: ./agroconnect
+    container_name: agroConnect-api
+    ports:
+      - "8088:8088"
+    environment:
+      # Sobrescribimos el localhost del properties por el nombre del servicio 'db'
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/agroConnect_database2
+      SPRING_DATASOURCE_USERNAME: agroConnect_user2
+      SPRING_DATASOURCE_PASSWORD: agroConnect_password2
+    depends_on:
+      - db
+
+  frontend:
+    build: ./web/agro-connect
+    container_name: agroConnect-web
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
