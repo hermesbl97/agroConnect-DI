@@ -18,6 +18,7 @@ export default function JobOffers() {
     const [locationFilter, setLocationFilter] = useState("all");
     const [sortOrder, setSortOrderJobOffer] = useState<"asc" | "des">("asc");
     const [minSalary, setMinSalary] = useState<number>(0);
+    const [dateFilter, setDateFilter] = useState("");
 
     const locationOptions = Array.from(
         new Set(jobOffers.map((jobOffer) => jobOffer.location)),
@@ -33,6 +34,14 @@ export default function JobOffers() {
 
         if (jobOffer.salary < minSalary) {
             return false;
+        }
+
+        //Filtro por disponibilidad en el calenadrio
+        if (dateFilter) {
+            // comparamos si el día seleccionado está entre la fecha de inicio o no
+            if (dateFilter < jobOffer.startDate || dateFilter > jobOffer.endDate) {
+                return false;
+            }
         }
 
         // Búsqueda por titulo, localización o descripción)
@@ -111,12 +120,12 @@ export default function JobOffers() {
         }
     };
 
-        // Calcula estos valores antes del return del componente
-    const totalJobOffers = jobOffers.length;
-    const avgSalary = jobOffers.length > 0
-        ? (jobOffers.reduce((acc, p) => acc + Number(p.salary), 0) / jobOffers.length).toFixed(0)
+    // Calcula estos valores antes del return del componente
+    const totalJobOffers = filteredJobOffers.length;
+    const avgSalary = filteredJobOffers.length > 0
+        ? (filteredJobOffers.reduce((acc, p) => acc + Number(p.salary), 0) / filteredJobOffers.length).toFixed(0)
         : 0;
-    const locationCount = locationOptions.length;
+    const locationCount = new Set(filteredJobOffers.map((j) => j.location)).size;
 
     if (loading) return <LoadingStatus message="Cargando el listado de ofertas de trabajo..." />;
     if (error) return <ErrorStatus error={error} />;
@@ -258,6 +267,27 @@ export default function JobOffers() {
                                 </div>
                             </div>
 
+                            {/* Selector de fecha de disponibilidad */}
+                            <div className="relative flex items-center bg-white border rounded-lg" style={{ borderColor: theme.borders, height: '48px' }}>
+                                <span style={{ color: theme.subtext }} className="material-symbols-outlined absolute left-3 pointer-events-none">calendar_month</span>
+                                <input
+                                    type="date"
+                                    value={dateFilter}
+                                    onChange={(e) => setDateFilter(e.target.value)}
+                                    title="Mostrar ofertas activas en esta fecha"
+                                    style={{ color: theme.text }}
+                                    className="pl-10 pr-8 h-full bg-transparent outline-none focus:ring-2 focus:ring-primary rounded-lg text-sm cursor-pointer"
+                                />
+                                {dateFilter && (
+                                    <button
+                                        onClick={() => setDateFilter("")}
+                                        className="absolute right-2 text-zinc-400 hover:text-zinc-600 font-bold text-xs"
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+                            </div>
+
                             <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-4">
                                 {/* Filtro de salario minimo */}
                                 <div className="relative flex items-center">
@@ -304,8 +334,8 @@ export default function JobOffers() {
                         <div className="mb-6 text-center">
                             <span style={{ color: theme.subtext }} className="text-sm font-medium uppercase tracking-wider">
                                 {sortedJobOffers.length === 0
-                                    ? "No se han encontrado resultados para tu búsqueda"
-                                    : `Se han encontrado ${sortedJobOffers.length} productos`}
+                                    ? "No se han encontrado ofertas de empleo con los filtros aplicados"
+                                    : `Se han encontrado ${sortedJobOffers.length} ofertas de empleo`}
                             </span>
                         </div>
 
