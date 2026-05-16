@@ -208,14 +208,22 @@ export default function JobOffers() {
                 ) : (
                     /* LISTADO DE OFERTAS */
                     <>
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 style={{ color: theme.primary }} className="text-3xl font-serif font-bold">Ofertas Disponibles</h2>
+                        <div className="relative flex justify-center items-center mb-12">
+                            <h2 style={{ color: theme.primary }} className="text-3xl font-serif font-bold">
+                                Ofertas Disponibles
+                            </h2>
 
                             {/* Solo Agricultores o Admin pueden publicar */}
                             {(user?.role === 'admin' || user?.role === 'agricultor') && (
-                                <NavLink to="/registerJobOffer" style={{ backgroundColor: theme.primary }} className="text-white px-6 py-3 rounded font-bold shadow-lg">
-                                    Publicar Oferta
-                                </NavLink>
+                                <div className="absolute right-0">
+                                    <NavLink
+                                        to="/registerJobOffer"
+                                        style={{ backgroundColor: theme.primary }}
+                                        className="text-white px-6 py-3 rounded font-bold shadow-lg hover:brightness-110 transition-all text-sm whitespace-nowrap"
+                                    >
+                                        Publicar Oferta
+                                    </NavLink>
+                                </div>
                             )}
                         </div>
 
@@ -245,6 +253,15 @@ export default function JobOffers() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Contador de resultados */}
+                        <div className="mb-6 text-center">
+                            <span style={{ color: theme.subtext }} className="text-sm font-medium uppercase tracking-wider">
+                                {sortedJobOffers.length === 0
+                                    ? "No se han encontrado ofertas de empleo con los filtros aplicados"
+                                    : `Se han encontrado ${sortedJobOffers.length} ofertas de empleo`}
+                            </span>
+                        </div>
 
                         <div
                             style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
@@ -328,15 +345,6 @@ export default function JobOffers() {
                                     <option value="des">Orden: Z a la A</option>
                                 </select>
                             </div>
-                        </div>
-
-                        {/* Contador de resultados */}
-                        <div className="mb-6 text-center">
-                            <span style={{ color: theme.subtext }} className="text-sm font-medium uppercase tracking-wider">
-                                {sortedJobOffers.length === 0
-                                    ? "No se han encontrado ofertas de empleo con los filtros aplicados"
-                                    : `Se han encontrado ${sortedJobOffers.length} ofertas de empleo`}
-                            </span>
                         </div>
 
                         <div className="grid gap-6">
