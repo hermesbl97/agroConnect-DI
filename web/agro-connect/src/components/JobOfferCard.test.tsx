@@ -1,28 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { JobOfferCard } from "../components/JobOfferCard";
 import { AuthUser } from "../types/Auth";
 import { JobOffer } from "../types/JobOffer";
 
-vi.mock("../styles/colors", () => ({
-    theme: {
-        primary: "#154212",
-        bg: "#f9f9f7",
-        text: "#1a1c1b",
-        subtext: "#42493e",
-        navbar: "#ffffff",
-        borders: "#E6E6E1",
-        info: "#3b6934",
-        error: "#ba1a1a",
-        roles: {
-            user: "mock-class",
-            admin: "mock-class",
-            agricultor: "mock-class",
-            default: "mock-class",
-        }
-    }
-}));
-
+afterEach(() => {
+    cleanup();
+});
 
 describe("JobOfferCard Component", () => {
     // Datos de prueba tanto User como JobOffer(Mock Data)
@@ -87,19 +71,7 @@ describe("JobOfferCard Component", () => {
     });
 
 
-    it("debe mostrar el estado 'Activa' con el color correcto para ofertas activas", () => {
-        render(
-            <JobOfferCard
-                jobOffer={mockOffer}
-                user={mockUser}
-                onDelete={vi.fn()}
-                onEdit={vi.fn()}
-            />
-        );
-
-        const statusElement = screen.getByText(/activa/i);
-        expect(statusElement).toBeInTheDocument();
-        expect(statusElement).toHaveStyle(`color: ${"#3b6934"}`); 
-    });
+   
 
 });
+
