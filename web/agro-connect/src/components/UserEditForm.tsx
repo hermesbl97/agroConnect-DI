@@ -31,8 +31,8 @@ export function UserEditForm({ user, onChange, onSave, onCancel }: Props) {
             <form onSubmit={onSave} className="space-y-5">
                 {/* Campo para modificar el rol del usuario */} 
                 <div className="space-y-1">
-                    <label style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Rol de Usuario</label>
-                    <select name="role" value={user.role} onChange={handleChange} className="w-full p-3 bg-zinc-50 border rounded-lg outline-none font-medium">
+                    <label htmlFor="role" style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Rol de Usuario</label>
+                    <select id="role" name="role" value={user.role} onChange={handleChange} className="w-full p-3 bg-zinc-50 border rounded-lg outline-none font-medium">
                         <option value="user">USER (Estándar)</option>
                         <option value="agricultor">AGRICULTOR (Gestión de cultivos)</option>
                         <option value="admin">ADMIN (Control total)</option>
@@ -41,23 +41,23 @@ export function UserEditForm({ user, onChange, onSave, onCancel }: Props) {
                 <div className="grid grid-cols-2 gap-4">
                     {/* Campos para modificar el nombre y apellidos del usuario */}
                     <div className="space-y-1">
-                        <label style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Nombre</label>
-                        <input name="name" value={user.name} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                        <label htmlFor="name" style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Nombre</label>
+                        <input id="name" name="name" value={user.name} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
                     </div>
                     <div className="space-y-1">
-                        <label style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Apellidos</label>
-                        <input name="surname" value={user.surname} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                        <label htmlFor="surname" style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Apellidos</label>
+                        <input id="surname" name="surname" value={user.surname} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
                     </div>
                 </div>
                 {/* Campo para modificar el email del usuario */}
                 <div className="space-y-1">
-                    <label style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Email de contacto</label>
-                    <input name="email" value={user.email} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                    <label htmlFor="email" style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Email de contacto</label>
+                    <input id="email" name="email" value={user.email} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
                 </div>
                 {/* Campo para modificar el número de teléfono del usuario */}
                 <div className="space-y-1">
-                    <label style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Número de teléfono</label>
-                    <input name="telephoneNumber" value={user.telephoneNumber} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
+                    <label htmlFor="telephoneNumber" style={{ color: theme.subtext }} className="text-[10px] font-bold uppercase tracking-widest">Número de teléfono</label>
+                    <input id="telephoneNumber" name="telephoneNumber" value={user.telephoneNumber} onChange={handleChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
                 </div>
                     {/* Botones para cancelar o guardar los cambios */}
                 <div className="flex gap-3 pt-4">

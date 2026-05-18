@@ -189,7 +189,6 @@ export default function Users() {
                   className="w-full p-3 border rounded-lg bg-zinc-50"
                 />
               </div>
-
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"

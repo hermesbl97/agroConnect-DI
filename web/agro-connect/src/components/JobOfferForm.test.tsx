@@ -1,11 +1,16 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import {JobOfferForm} from "./JobOfferForm";
+
+afterEach(() => {
+    cleanup();
+});
 
 describe("JobOfferForm Component", () => {
     it("debe capturar los datos de los inputs y llamar a onSubmit al enviar el formulario", () => {
         // Se crea la función espía (Mock) para onSubmit
         const onSubmitSpy = vi.fn();
+        
 
         // Renderizamos el componente
         render(<JobOfferForm onSubmit={onSubmitSpy} isLoading={false} />);
