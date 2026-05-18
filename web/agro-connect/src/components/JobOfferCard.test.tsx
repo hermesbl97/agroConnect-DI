@@ -85,4 +85,21 @@ describe("JobOfferCard Component", () => {
 
         expect(screen.getByText(/zaragoza/i)).toBeDefined();
     });
+
+
+    it("debe mostrar el estado 'Activa' con el color correcto para ofertas activas", () => {
+        render(
+            <JobOfferCard
+                jobOffer={mockOffer}
+                user={mockUser}
+                onDelete={vi.fn()}
+                onEdit={vi.fn()}
+            />
+        );
+
+        const statusElement = screen.getByText(/activa/i);
+        expect(statusElement).toBeInTheDocument();
+        expect(statusElement).toHaveStyle(`color: ${"#3b6934"}`); 
+    });
+
 });

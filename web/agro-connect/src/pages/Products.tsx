@@ -145,7 +145,6 @@ export default function Products() {
                                     {ecosystem}
                                 </option>
                             ))}
-
                         </select>
 
                         {/* Filtro de orden */}
