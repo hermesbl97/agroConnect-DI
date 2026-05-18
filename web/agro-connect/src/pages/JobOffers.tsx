@@ -6,6 +6,8 @@ import { ErrorStatus } from "../components/ErrorStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { theme } from "../styles/colors";
 import { NavLink } from "react-router-dom";
+import { JobOfferCard } from "../components/JobOfferCard";
+import { JobOfferEditForm } from "../components/JobOfferEditForm";
 
 export default function JobOffers() {
     const { token, user } = useAuth();
@@ -94,16 +96,15 @@ export default function JobOffers() {
         }
     };
 
+    const handleEditChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { 
+    if (!editingJobOffer) return; //si no se ha activado editar una oferta de empleo, abortar función
+    const { name, value } = e.target;
 
-    const handleEditChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { //capturamos los datos
-        if (!editingJobOffer) return; //si no se ha activado editar una oferta de empleo, abortar función
-        const { name, value } = e.target;
-
-        setEditingJobOffer({
-            ...editingJobOffer, //hacemos copia de la oferta actual
-            [name]: value
-        });
-    };
+    setEditingJobOffer({ //hacemos copia de la oferta actual
+        ...editingJobOffer,
+        [name]: value
+    });
+};
 
     const handleDelete = async (jobOfferId: number) => {
         if (!window.confirm("¿Estás seguro de que deseas eliminar esta oferta de empleo?")) return;
@@ -129,6 +130,7 @@ export default function JobOffers() {
 
     if (loading) return <LoadingStatus message="Cargando el listado de ofertas de trabajo..." />;
     if (error) return <ErrorStatus error={error} />;
+
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: "80vh" }}>
             {/* Solo mostramos el Hero si NO estamos editando */}
@@ -146,81 +148,23 @@ export default function JobOffers() {
             )}
 
             <main className="max-w-7xl mx-auto px-8 py-12">
+                {/* FORMULARIO DE EDICIÓN  */}
                 {editingJobOffer ? (
-                    /* FORMULARIO DE EDICIÓN */
-                    <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="max-w-2xl mx-auto p-8 rounded-2xl shadow-xl border">
-                        <h2 style={{ color: theme.primary }} className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
-                            <span className="material-symbols-outlined">edit_document</span>
-                            Editar Oferta
-                        </h2>
-
-                        <form onSubmit={handleSave} className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Título de la vacante</label>
-                                <input name="title" value={editingJobOffer.title} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" required />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Descripción</label>
-                                <textarea name="description" value={editingJobOffer.description} onChange={handleEditChange as any} className="w-full p-3 border rounded-lg bg-zinc-50 min-h-[100px]" required />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Ubicación</label>
-                                    <input name="location" value={editingJobOffer.location} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Salario (€/h)</label>
-                                    <input type="number" name="salary" value={editingJobOffer.salary} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Fecha Inicio</label>
-                                    <input type="date" name="startDate" value={String(editingJobOffer.startDate)} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Fecha Fin</label>
-                                    <input type="date" name="endDate" value={String(editingJobOffer.endDate)} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50" />
-                                </div>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Estado</label>
-                                <select name="state" value={String(editingJobOffer.state)} onChange={handleEditChange} className="w-full p-3 border rounded-lg bg-zinc-50 font-bold">
-                                    <option value="true">ACTIVA</option>
-                                    <option value="false">CADUCADA</option>
-                                </select>
-                            </div>
-
-                            <div className="flex gap-3 pt-6">
-                                <button type="button" onClick={() => setEditingJobOffer(null)} className="flex-1 py-3 border rounded-lg font-bold hover:bg-zinc-100 transition-colors">
-                                    CANCELAR
-                                </button>
-                                <button type="submit" style={{ backgroundColor: theme.primary }} className="flex-[2] py-3 text-white rounded-lg font-bold hover:brightness-110 shadow-lg">
-                                    GUARDAR CAMBIOS
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <JobOfferEditForm
+                        offer={editingJobOffer}
+                        onChange={handleEditChange}
+                        onSave={handleSave}
+                        onCancel={() => setEditingJobOffer(null)}
+                    />
                 ) : (
-                    /* LISTADO DE OFERTAS */
                     <>
+                        {/* Listado de Ofertas */}
                         <div className="relative flex justify-center items-center mb-12">
-                            <h2 style={{ color: theme.primary }} className="text-3xl font-serif font-bold">
-                                Ofertas Disponibles
-                            </h2>
-
+                            <h2 style={{ color: theme.primary }} className="text-3xl font-serif font-bold">Ofertas Disponibles</h2>
                             {/* Solo Agricultores o Admin pueden publicar */}
                             {(user?.role === 'admin' || user?.role === 'agricultor') && (
                                 <div className="absolute right-0">
-                                    <NavLink
-                                        to="/registerJobOffer"
-                                        style={{ backgroundColor: theme.primary }}
-                                        className="text-white px-6 py-3 rounded font-bold shadow-lg hover:brightness-110 transition-all text-sm whitespace-nowrap"
-                                    >
+                                    <NavLink to="/registerJobOffer" style={{ backgroundColor: theme.primary }} className="text-white px-6 py-3 rounded font-bold shadow-lg hover:brightness-110 transition-all text-sm whitespace-nowrap">
                                         Publicar Oferta
                                     </NavLink>
                                 </div>
@@ -231,25 +175,17 @@ export default function JobOffers() {
                         {(user?.role === 'admin' || user?.role === 'agricultor') && (
                             /* VISTA ADMIN/AGRICULTOR: Se muestran los componentes de resumen */
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
-                                    className="p-6 rounded-xl border shadow-sm">
-                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
-                                        Número de Ofertas de empleo</p>
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">Nº Ofertas</p>
                                     <p style={{ color: theme.primary }} className="text-3xl font-bold">{totalJobOffers}</p>
                                 </div>
-                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
-                                    className="p-6 rounded-xl border shadow-sm">
-                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
-                                        Número de localizaciones</p>
-                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">
-                                        {locationCount}</p>
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">Nº Localizaciones</p>
+                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">{locationCount}</p>
                                 </div>
-                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
-                                    className="p-6 rounded-xl border shadow-sm">
-                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">
-                                        Salario medio</p>
-                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">
-                                        {avgSalary} <span className="text-sm font-normal">€/hora</span></p>
+                                <div style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="p-6 rounded-xl border shadow-sm">
+                                    <p style={{ color: theme.subtext }} className="text-xs font-bold uppercase tracking-wider">Salario medio</p>
+                                    <p style={{ color: theme.primary }} className="text-3xl font-bold">{avgSalary}€/hora</p>
                                 </div>
                             </div>
                         )}
@@ -263,6 +199,7 @@ export default function JobOffers() {
                             </span>
                         </div>
 
+                        {/* Filtros */}
                         <div
                             style={{ backgroundColor: theme.navbar, borderColor: theme.borders }}
                             className="mb-8 p-4 rounded-xl border shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between"
@@ -318,14 +255,14 @@ export default function JobOffers() {
                                         className="pl-10 pr-4 w-full lg:w-40 rounded-lg border bg-white focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
                                     />
                                 </div>
-                                {/* Filtro de loalización */}
+                                {/* Filtro de localizaciones */}
                                 <select
                                     value={locationFilter}
                                     onChange={(jobOffer) => setLocationFilter(jobOffer.target.value)}
                                     style={{ borderColor: theme.borders, color: theme.text }}
                                     className="px-4 py-2 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-primary"
                                 >
-                                    <option value="all">Todas los ecosistemas</option>
+                                    <option value="all">Todos las localizaciones</option>
                                     {locationOptions.map((location) => (
                                         <option key={location} value={location}>
                                             {location}
@@ -347,67 +284,16 @@ export default function JobOffers() {
                             </div>
                         </div>
 
+                        {/* Lista de Tarjetas */}
                         <div className="grid gap-6">
                             {sortedJobOffers.map((jobOffer) => (
-                                <div key={jobOffer.id} style={{ backgroundColor: theme.navbar, borderColor: theme.borders }} className="border rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
-
-                                    {/* Icono de Oferta */}
-                                    <div style={{ backgroundColor: theme.bg }} className="w-20 h-20 flex items-center justify-center rounded-lg">
-                                        <span className="material-symbols-outlined text-4xl" style={{ color: theme.primary }}>agriculture</span>
-                                    </div>
-
-                                    <div className="flex-grow flex flex-col items-start text-left">
-                                        <div className="flex justify-between items-start">
-                                            <h3 style={{ color: theme.primary }} className="text-xl font-bold">{jobOffer.title}</h3>
-                                        </div>
-                                        <p style={{ color: theme.subtext }} className="mt-2 text-m line-clamp-2">{jobOffer.description}</p>
-
-                                        <div className="flex flex-wrap items-center gap-x-12 gap-y-4 mt-8 w-full border-t border-zinc-100 pt-6">
-                                            <div className="flex items-center gap-3 text-zinc-600">
-                                                <span className="material-symbols-outlined text-m text-emerald-600">location_on</span>
-                                                <span className="text-sm font-semibold uppercase tracking-wide">{jobOffer.location}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 text-zinc-600">
-                                                <span className="material-symbols-outlined text-m text-emerald-600">payments</span>
-                                                <span style={{ color: theme.primary }} className="text-lg font-black">{jobOffer.salary}€/h</span>
-                                            </div>
-                                            <div className="flex items-center gap-3 text-zinc-600">
-                                                <span className="material-symbols-outlined text-m text-emerald-600">calendar_month</span>
-                                                <span className="text-sm font-semibold">{jobOffer.startDate} — {jobOffer.endDate}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex md:flex-col justify-center gap-2">
-                                        {/* Solo el dueño o Admin pueden ver el estado de las ofertas */}
-                                        {(user?.role === 'admin' || user?.id === jobOffer.creator?.id) && (
-                                            <span
-                                                style={{ color: jobOffer.state ? theme.info : theme.error }}
-                                                className="text-[10px] font-bold uppercase tracking-widest  px-6 py-2 rounded font-bold text-sm">
-                                                {jobOffer.state ? "Activa" : "Caducada"}
-                                            </span>)}
-
-                                        <button style={{ backgroundColor: theme.primary }} className="text-white px-6 py-2 rounded font-bold text-sm">
-                                            Aplicar
-                                        </button>
-
-                                        {/* Acciones de gestión para el dueño o admin */}
-                                        {(user?.role === 'admin' || user?.id === jobOffer.creator?.id) && (
-                                            <button
-                                                onClick={() => setEditingJobOffer(jobOffer)}
-                                                className="p-2 hover:bg-blue-50 rounded">
-                                                Editar
-                                            </button>
-                                        )}    {(user?.role === 'admin' || user?.id === jobOffer.creator?.id) && (
-                                            <button
-                                                onClick={() => handleDelete(jobOffer.id)}
-                                                style={{ color: theme.error }}
-                                                className="p-2 hover:bg-red-50 rounded">
-                                                Eliminar
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
+                                <JobOfferCard
+                                    key={jobOffer.id}
+                                    jobOffer={jobOffer}
+                                    user={user}
+                                    onEdit={setEditingJobOffer}
+                                    onDelete={handleDelete}
+                                />
                             ))}
                         </div>
                     </>
@@ -415,4 +301,4 @@ export default function JobOffers() {
             </main>
         </div>
     );
-} 
+}
